@@ -1,3 +1,9 @@
+--******************************************************************
+                                                                -- *
+--  answers from questions at https://sqlzoo.net/wiki/SQL_Tutorial *
+                                                               --  *
+-- *****************************************************************
+
 -- 0 Select basics
 
 -- 1. Introducing the world table of countries
@@ -101,6 +107,67 @@ SELECT name FROM world WHERE LENGTH(name) = 4
 -- The capital of Luxembourg is Luxembourg. Show all the countries where the capital is the same as the name of the country
 -- Answer
 SELECT name FROM world WHERE name = capital
+
+-- 2. SELECT from nobel
+
+-- 1. Winners from 1950
+-- Change the query shown so that it displays Nobel prizes for 1950.
+-- Answer
+SELECT yr, subject, winner FROM nobel WHERE yr = 1950
+
+-- 2. 1962 Literature
+-- Show who won the 1962 prize for Literature.
+-- Answer
+SELECT winner from nobel WHERE yr = 1962 AND subject = 'literature'
+
+-- 3. Albert Einstein
+-- Show the year and subject that won 'Albert Einstein' his prize.
+-- Answer
+SELECT yr, subject FROM nobel WHERE winner = 'Albert Einstein'
+
+-- 4. Recent Peace Prizes
+-- Give the name of the 'Peace' winners since the year 2000, including 2000.
+-- Answer
+SELECT winner FROM nobel WHERE yr BETWEEN 2000 AND 2020 AND subject = 'Peace'
+
+-- 5. Literature in the 1980's
+-- Show all details (yr, subject, winner) of the Literature prize winners for 1980 to 1989 inclusive.
+-- Answer
+SELECT yr, subject, winner FROM nobel 
+WHERE yr BETWEEN 1980 AND 1989 
+AND subject = 'literature'
+
+-- 6. Only Presidents
+-- Show all details of the presidential winners:
+-- 'Theodore Roosevelt', 'Woodrow Wilson', 'Jimmy Carter', 'Barack Obama' 
+-- Answer
+SELECT * FROM nobel WHERE  winner 
+IN ('Theodore Roosevelt', 'Woodrow Wilson', 'Jimmy Carter', 'Barack Obama')
+
+-- 7. John
+-- Show the winners with first name John
+-- Answer
+SELECT winner FROM nobel WHERE winner like 'John%'
+
+-- 8. Chemistry and Physics from different years
+-- Show the year, subject, and name of Physics winners for 1980 together with the Chemistry winners for 1984
+-- Answer
+SELECT yr, subject, winner FROM nobel 
+WHERE (subject = 'chemistry' 
+and yr = 1984)
+OR (subject = 'physics'
+AND yr = 1980);
+
+-- 9 .Exclude Chemists and Medics
+-- Show the year, subject, and name of winners for 1980 excluding Chemistry and Medicine
+-- Answer
+SELECT * FROM nobel WHERE subject REGEXP '[^chemistry medicine]' AND yr = 1980
+
+-- 10. Early Medicine, Late Literature
+-- Show year, subject, and name of people who won a 'Medicine' prize in an early year (before 1910, not including 1910) together with winners of a 'Literature' prize in a later year (after 2004, including 2004)
+-- Answer:
+SELECT yr, subject, winner FROM nobel WHERE (subject = 'medicine' AND yr < 1910) OR (subject = 'literature' AND yr >= 2004)
+
 
 
 
