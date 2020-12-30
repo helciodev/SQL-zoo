@@ -169,10 +169,65 @@ SELECT * FROM nobel WHERE subject REGEXP '[^chemistry medicine]' AND yr = 1980
 SELECT yr, subject, winner FROM nobel WHERE (subject = 'medicine' AND yr < 1910) OR (subject = 'literature' AND yr >= 2004)
 
 
+-- SELECT IN
 
+-- 1. Bigger than Russia
+-- List each country name where the population is larger than that of 'Russia'.
+-- Answer
+SELECT name FROM world
+  WHERE population >
+     (SELECT population FROM world
+      WHERE name='Russia')
 
+-- 2. Richer than UK 
+-- Show the countries in Europe with a per capita GDP greater than 'United Kingdom'.
+-- Answer
+SELECT name FROM world WHERE continent = 'europe' AND 
+gdp/population > (SELECT gdp/population FROM world WHERE name = 'United Kingdom')
 
+-- 3. Neighbours of Argentina and Australia
+-- List the name and continent of countries in the continents containing either Argentina or Australia. Order by name of the country.
+-- Answer
+SELECT name, continent FROM world WHERE continent IN ('South America', 'Oceania') ORDER BY name
 
+-- 4. Between Canada and Poland
+-- Which country has a population that is more than Canada but less than Poland? Show the name and the population.
+-- Answer
+SELECT name FROM world WHERE population 
+> ( SELECT population FROM world WHERE name = 'Canada' ) 
+AND population < ( SELECT population FROM world WHERE name = 'Poland' )
 
+-- 5. Percentages of Germany
+-- Germany (population 80 million) has the largest population of the countries in Europe. Austria (population 8.5 million) has 11% of the population of Germany.
 
+-- Show the name and the population of each country in Europe. Show the population as a percentage of the population of Germany.
 
+-- The format should be Name, Percentage for example:
+-- _____________________
+-- |name	  |percentage|
+-- |Albania	|3%        |
+-- |Andorra	|0%        |
+-- |Austria	|11%       |
+-- |...	... |          |
+-- |________|__________|
+-- Answer
+SELECT name, CONCAT(ROUND(population * 100 / (SELECT population FROM world WHERE name = 'germany')), '%')  AS percentage FROM world WHERE continent = 'europe'
+
+-- 6. Bigger than every country in Europe
+-- Which countries have a GDP greater than every country in Europe? [Give the name only.] (Some countries may have NULL gdp values)
+-- Answer
+   SELECT name, gdp FROM world WHERE continent !='europe' AND gdp  >= all(select gdp FROM world WHERE gdp != 0 AND continent = 'europe')
+
+  -- 7. Largest in each continent
+  -- Find the largest country (by area) in each continent, show the continent, the name and the area:
+-- Answer:
+  SELECT continent, name, area FROM world x
+  WHERE area >= ALL( SELECT area FROM world y
+  WHERE x.continent = y.continent and area != 0)
+
+  -- 8. First country of each continent (alphabetically)
+  -- List each continent and the name of the country that comes first alphabetically.
+  SELECT continent,name FROM world x
+  WHERE i.name <= ALL (
+    SELECT name FROM world y
+     WHERE x.continent= y.continent)
