@@ -5,6 +5,7 @@
 -- *****************************************************************
 
 -- 0 Select basics
+-- https://sqlzoo.net/wiki/SELECT_basics
 
 -- 1. Introducing the world table of countries
 -- The example uses a WHERE clause to show the population of 'France'. Note that strings (pieces of text that are data) should be in 'single quotes';
@@ -35,7 +36,8 @@ SELECT name, area FROM world
 SELECT name, area FROM world
   WHERE area BETWEEN 200000 AND 250000;
 
--- 1 SELECT names
+-- 1 SELECT from world QUIZ
+-- https://sqlzoo.net/wiki/SELECT_from_WORLD_Tutorial
 
 -- 1. Find the country that start with Y
 -- You can use WHERE name LIKE 'B%' to find the countries that start with "B".
@@ -108,7 +110,9 @@ SELECT name FROM world WHERE LENGTH(name) = 4
 -- Answer
 SELECT name FROM world WHERE name = capital
 
--- 2. SELECT from nobel
+-- SELECT from nobel QUIZ
+-- https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial
+
 
 -- 1. Winners from 1950
 -- Change the query shown so that it displays Nobel prizes for 1950.
@@ -169,7 +173,8 @@ SELECT * FROM nobel WHERE subject REGEXP '[^chemistry medicine]' AND yr = 1980
 SELECT yr, subject, winner FROM nobel WHERE (subject = 'medicine' AND yr < 1910) OR (subject = 'literature' AND yr >= 2004)
 
 
--- SELECT IN
+-- SELECT IN QUIZ
+-- https://sqlzoo.net/wiki/SELECT_within_SELECT_Tutorial
 
 -- 1. Bigger than Russia
 -- List each country name where the population is larger than that of 'Russia'.
@@ -228,6 +233,54 @@ SELECT name, CONCAT(ROUND(population * 100 / (SELECT population FROM world WHERE
   -- 8. First country of each continent (alphabetically)
   -- List each continent and the name of the country that comes first alphabetically.
   SELECT continent,name FROM world x
-  WHERE i.name <= ALL (
+  WHERE x.name <= ALL (
     SELECT name FROM world y
      WHERE x.continent= y.continent)
+
+    --  SUM and COUNT QUIZ
+    -- https://sqlzoo.net/wiki/SUM_and_COUNT
+
+    -- 1. Total world population
+    --  Show the total population of the world.
+    -- Answer:
+    SELECT SUM(population) FROM world;
+
+    -- 2. Total world population
+    -- List all the continents - just once each.
+    -- Answer:
+    SELECT DISTINCT continent FROM  world
+
+    -- 3. GDP of Africa
+    -- Give the total GDP of Africa
+    -- Answer:
+    SELECT SUM(gdp) FROM world WHERE continent = 'africa'
+
+    -- 4. Count the big countries
+    -- How many countries have an area of at least 1000000
+    -- Answer:
+    SELECT COUNT(name) FROM world where area >= 1000000
+
+  -- 5. Baltic states population
+  -- What is the total population of ('Estonia', 'Latvia', 'Lithuania')
+  -- Answer:
+  SELECT SUM (population) 
+  FROM world 
+  WHERE name IN ('Estonia', 'Latvia', 'Lithuania')
+
+  -- 6. Counting the countries of each continent
+  -- For each continent show the continent and number of countries.
+  -- Answer
+  SELECT continent, COUNT (name) FROM world GROUP BY continent
+
+  -- 7. Counting big countries in each continent
+  -- For each continent show the continent and number of countries with populations of at least 10 million.
+  -- Answer:
+  SELECT continent, COUNT(name) 
+  FROM world 
+  WHERE population >= 10000000 GROUP BY continent
+
+  -- 8. Counting big continents
+  -- List the continents that have a total population of at least 100 million.
+  SELECT continent 
+  FROM world 
+  GROUP BY (continent) HAVING sum(population) >= 100000000  
