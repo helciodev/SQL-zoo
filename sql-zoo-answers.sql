@@ -316,14 +316,14 @@ JOIN goal y on ( x.id = y.matchid) where teamid = 'GER'
 -- 4. Use the same JOIN as in the previous question.
 
 -- Show the team1, team2 and player for every goal scored by a player called Mario player LIKE 'Mario%'
--- Answer
+-- Answer:
 SELECT team1, team2, player FROM game x
 JOIN goal y ON (x.id = y.matchid) WHERE player REGEXP '^Mario'
 
 -- 5. The table eteam gives details of every national team including the coach. You can JOIN goal to eteam using the phrase goal JOIN eteam on teamid=id
 
 -- Show player, teamid, coach, gtime for all goals scored in the first 10 minutes gtime<=10
--- Answer
+-- Answer:
 SELECT player, teamid, coach, gtime FROM eteam x
 JOIN goal y ON (x.id = y.teamid) WHERE gtime <= 10
 
@@ -338,13 +338,84 @@ SELECT mdate, teamname FROM game x
 JOIN eteam y on (x.team1 = y.id) WHERE coach = 'Fernando Santos'
 
 -- 7 List the player for every goal scored in a game where the stadium was 'National Stadium, Warsaw'
--- Answer
+-- Answer:
 SELECT player from goal x
 JOIN game y on ( x.matchid = y.id) where stadium = 'National Stadium, Warsaw'
 
 -- 8 The example query shows all goals scored in the Germany-Greece quarterfinal.
 -- The example query shows all goals scored in the Germany-Greece quarterfinal.
 -- Instead show the name of all players who scored a goal against Germany.
--- Answer
+-- Answer:
 SELECT DISTINCT player FROM game x
 JOIN goal y ON (x.id = y.matchid) WHERE (team1 = 'GER' OR team2 = 'GER') and temaid != 'GER';
+
+-- More JOIN operations
+-- https://sqlzoo.net/wiki/More_JOIN_operations
+
+-- 1. 1962 movies
+-- List the films where the yr is 1962 [Show id, title]
+-- Answer:
+SELECT id, title
+ FROM movie
+ WHERE yr=1962
+
+--  2. When was Citizen Kane released?
+-- Give year of 'Citizen Kane'.
+-- Answer:
+SELECT yr FROM movie WHERE title ='Citizen kane'
+
+-- 3. Star Trek movies
+-- List all of the Star Trek movies, include the id, title and yr (all of these movies include the words Star Trek in the title). Order results by year.
+-- Answer:
+SELECT id, title, yr FROM movie 
+where title REGEXP 'Star Trek' 
+ORDER BY yr
+
+-- 4. id for actor Glenn Close
+-- What id number does the actor 'Glenn Close' have?
+-- Answer:
+SELECT id FROM actor WHERE name = 'Glenn Close'
+
+-- 5. id for Casablanca
+-- What is the id of the film 'Casablanca'
+-- Answer:
+SELECT id from movie WHERE title = 'Casablanca'
+
+-- 6. Cast list for Casablanca
+-- Obtain the cast list for 'Casablanca'.
+-- The cast list is the names of the actors who were in the movie.
+-- Use movieid=11768, (or whatever value you got from the previous question)
+-- Answer:
+SELECT name FROM actor x, casting y WHERE y.movieid = 11768 AND x.id = y.actor.id
+
+-- 7. Alien cast list
+-- Obtain the cast list for the film 'Alien'
+-- Answer:
+SELECT name FROM actor x, casting y 
+WHERE movieid = (SELECT id FROM movie where title = 'Alien')
+ AND x.id = y.actorid
+
+--  8. Harrison Ford movies
+-- List the films in which 'Harrison Ford' has appeared
+-- Answer:
+SELECT title FROM movie mov, actor act
+join casting cas ON (cas.actorid = act.id)
+ WHERE name = 'Harrison Ford' 
+ AND mov.id = cas.movieid
+
+--  9 Harrison Ford as a supporting actor
+-- List the films where 'Harrison Ford' has appeared - but not in the starring role. [Note: the ord field of casting gives the position of the actor. If ord=1 then this actor is in the starring role]
+-- Answer:
+SELECT title FROM movie mov, actor act 
+JOIN casting cas ON (cas.actorid = act.id)
+WHERE name = 'Harrison Ford'
+AND mov.id = cas.movieid 
+AND cas.ord != 1
+
+-- 10 Lead actors in 1962 movies
+-- List the films together with the leading star for all 1962 films.
+-- Answer:
+SELECT title, name FROM actor act, movie mov
+JOIN casting cas ON ( cas.movieid = mov.id) WHERE mov.yr = 1962
+AND act.id = cas.actorid
+AND cas.ord = 1
